@@ -1,0 +1,126 @@
+# Firebase App Hosting Configuration
+# Ce fichier peut être commité en toute sécurité dans Git.
+# Les secrets sont stockés dans Cloud Secret Manager et référencés ici.
+
+# Paramètres Cloud Run
+runConfig:
+  minInstances: 0        # Scale to zero pour économies
+  maxInstances: 10       # Augmenter si forte charge
+  concurrency: 80        # Requêtes simultanées par instance
+  cpu: 1                 # 1 CPU par instance
+  memoryMiB: 512         # 512 MiB par instance (augmenter à 1024 si conversions lourdes)
+
+# Variables d'environnement
+env:
+  # ========================================
+  # Variables publiques Firebase (NEXT_PUBLIC_*)
+  # Ces valeurs peuvent être commitées car elles sont publiques
+  # Remplacer les valeurs ci-dessous par vos propres valeurs Firebase
+  # ========================================
+
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyBaLwtXUW0RxzGRsoZP2JM2JqAHyQn9mCE
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: py-2-nb.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: py-2-nb
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: py-2-nb.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: 877532780896
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:877532780896:web:94f8144ded95606afe2605
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # ========================================
+  # Variables publiques Stripe
+  # ========================================
+
+  - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    value: pk_live_51RfmqoApPIHMnuGKpvN2YUoRV4XB3y7XywqmuknQXxBPYJYmci0TB9jDsLRm17PnCtQ1031jUTJW9PYIwdSXp9tX00sPTDpTpD
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # ========================================
+  # URL de l'application
+  # Remplacer par votre domaine custom ou URL Cloud Run
+  # ========================================
+
+  - variable: NEXT_PUBLIC_APP_URL
+    value: https://py2nb--py-2-nb.europe-west4.hosted.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # ========================================
+  # Secrets (références Cloud Secret Manager)
+  # Format: secret: nom-du-secret
+  # Les valeurs réelles sont dans Cloud Secret Manager
+  # Commandes pour créer: voir DEPLOYMENT.md section "Cloud Secret Manager"
+  # ========================================
+
+  # Firebase Admin SDK
+  - variable: FIREBASE_PROJECT_ID
+    value: py-2-nb
+    availability:
+      - RUNTIME
+
+  - variable: FIREBASE_CLIENT_EMAIL
+    secret: firebase-client-email
+    availability:
+      - RUNTIME
+
+  - variable: FIREBASE_PRIVATE_KEY
+    secret: firebase-private-key
+    availability:
+      - RUNTIME
+
+  # Anthropic Claude API
+  - variable: ANTHROPIC_API_KEY
+    secret: anthropic-api-key
+    availability:
+      - RUNTIME
+
+  # Stripe
+  - variable: STRIPE_SECRET_KEY
+    secret: stripe-secret-key
+    availability:
+      - RUNTIME
+
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: stripe-webhook-secret
+    availability:
+      - RUNTIME
+
+  - variable: STRIPE_PRO_PRICE_ID
+    value: prod_TymXqK3FiYcXCg
+    availability:
+      - RUNTIME
+
+  - variable: STRIPE_PREMIUM_PRICE_ID
+    value: prod_TymValL5YRTCUh
+    availability:
+      - RUNTIME

@@ -37,42 +37,79 @@ export default function HomePage() {
       return;
     }
 
-    if (!user) {
-      toast.error("Connectez-vous pour convertir votre code");
+    // Flow 1: User connecté
+    if (user) {
+      setLoading(true);
+      setResult(null);
+
+      try {
+        const token = Cookies.get("firebase-auth-token");
+
+        const res = await fetch("/api/convert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ code, fileName }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "Erreur de conversion");
+        }
+
+        const data: ConvertResult = await res.json();
+        setResult(data);
+        setConversionsUsed((prev) => prev + 1);
+        toast.success(
+          `Notebook genere en ${(data.processingTimeMs / 1000).toFixed(1)}s !`
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Erreur de conversion";
+        toast.error(message);
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
+    // Flow 2: User NON connecté → Pay-per-use
+    const lineCount = code.split("\n").length;
+    let price: number;
+    if (lineCount < 200) price = 0.2;
+    else if (lineCount <= 1000) price = 0.5;
+    else price = 1.0;
+
+    const confirmed = confirm(
+      `Cette conversion coûte ${price.toFixed(2)}€ (${lineCount} lignes).\n\nVous serez redirigé vers Stripe pour le paiement.\n\nContinuer ?`
+    );
+
+    if (!confirmed) return;
+
     setLoading(true);
-    setResult(null);
 
     try {
-      const token = Cookies.get("firebase-auth-token");
-
-      const res = await fetch("/api/convert", {
+      const res = await fetch("/api/convert/pay-per-use", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, fileName }),
       });
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Erreur de conversion");
+        throw new Error(err.error || "Erreur de paiement");
       }
 
-      const data: ConvertResult = await res.json();
-      setResult(data);
-      setConversionsUsed((prev) => prev + 1);
-      toast.success(
-        `Notebook genere en ${(data.processingTimeMs / 1000).toFixed(1)}s !`
-      );
+      const data = await res.json();
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.checkoutUrl;
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Erreur de conversion";
+        error instanceof Error ? error.message : "Erreur de paiement";
       toast.error(message);
-    } finally {
       setLoading(false);
     }
   };
@@ -112,11 +149,21 @@ export default function HomePage() {
               <ConvertButton
                 onClick={handleConvert}
                 loading={loading}
-                disabled={!code.trim() || !user}
+                disabled={!code.trim()}
               />
-              {!user && (
-                <p className="text-center text-sm text-zinc-500">
-                  Connectez-vous avec Google pour commencer
+              {!user && code.trim() && (
+                <p className="text-center text-sm text-zinc-400">
+                  💳 Paiement à l&apos;usage : {" "}
+                  {code.split("\n").length < 200 && "0.20€"}
+                  {code.split("\n").length >= 200 &&
+                    code.split("\n").length <= 1000 &&
+                    "0.50€"}
+                  {code.split("\n").length > 1000 && "1.00€"}
+                  {" "}• Ou{" "}
+                  <a href="/login" className="text-indigo-400 hover:underline">
+                    connectez-vous
+                  </a>
+                  {" "}pour 3 conversions gratuites
                 </p>
               )}
             </div>

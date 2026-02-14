@@ -115,6 +115,7 @@ function LoginForm() {
                 placeholder="Votre nom"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
+                autoComplete="name"
                 required
                 disabled={loading}
               />
@@ -128,6 +129,7 @@ function LoginForm() {
               placeholder="vous@exemple.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
               disabled={loading}
             />
@@ -141,6 +143,7 @@ function LoginForm() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete={isSignup ? "new-password" : "current-password"}
                 required
                 minLength={6}
                 disabled={loading}
@@ -163,6 +166,7 @@ function LoginForm() {
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
                 required
                 minLength={6}
                 disabled={loading}
