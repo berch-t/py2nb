@@ -2,11 +2,12 @@
 
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function AuthButton() {
-  const { user, loading, loginWithGoogle, logout } = useAuthStore();
+  const { user, loading, logout } = useAuthStore();
 
   if (loading) {
     return (
@@ -41,9 +42,13 @@ export function AuthButton() {
   }
 
   return (
-    <Button onClick={loginWithGoogle} size="sm">
-      <LogIn className="h-4 w-4" />
-      Connexion Google
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button variant="ghost" size="sm" asChild>
+        <Link href="/login">Connexion</Link>
+      </Button>
+      <Button size="sm" asChild>
+        <Link href="/login?mode=signup">S&apos;inscrire</Link>
+      </Button>
+    </div>
   );
 }

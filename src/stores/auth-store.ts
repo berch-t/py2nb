@@ -5,6 +5,9 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   signInWithRedirect,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
   GoogleAuthProvider,
   signOut,
   type User,
@@ -20,6 +23,8 @@ interface AuthState {
   initialized: boolean;
   hydrate: () => void;
   loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  signupWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -89,6 +94,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Full reload after popup (COOP workaround)
       window.location.href = "/";
     }
+  },
+
+  loginWithEmail: async (email: string, password: string) => {
+    const auth = getAuth();
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const token = await cred.user.getIdToken();
+    Cookies.set("firebase-auth-token", token, { expires: 7 });
+    window.location.href = "/";
+  },
+
+  signupWithEmail: async (email: string, password: string, displayName: string) => {
+    const auth = getAuth();
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName });
+    const token = await cred.user.getIdToken();
+    Cookies.set("firebase-auth-token", token, { expires: 7 });
+    window.location.href = "/";
   },
 
   logout: async () => {
