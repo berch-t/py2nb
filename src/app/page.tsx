@@ -1,11 +1,24 @@
+import type { Metadata } from "next";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { PricingCards } from "@/components/pricing/pricing-cards";
+import { JsonLd } from "@/components/seo/json-ld";
+
+export const metadata: Metadata = {
+  title:
+    "Py2Nb — Convertissez vos scripts Python en notebooks Jupyter avec l'IA",
+  description:
+    "Collez votre code Python, l'IA ajoute des explications structurées en markdown, et téléchargez un notebook Jupyter (.ipynb) professionnel. Gratuit jusqu'à 3 conversions/mois.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default function HomePage() {
   return (
     <>
+      <JsonLd />
       <HeroSection />
       <HowItWorks />
       <FeaturesSection />

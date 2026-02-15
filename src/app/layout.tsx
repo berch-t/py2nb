@@ -1,10 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { AuthHydrator } from "@/components/auth/auth-hydrator";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import {
+  APP_NAME,
+  APP_DESCRIPTION,
+  APP_URL,
+  SEO_KEYWORDS,
+} from "@/lib/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,25 +22,66 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#09090b",
+};
+
 export const metadata: Metadata = {
-  title: "Py2Nb - Python to Notebook avec IA",
-  description:
-    "Transformez vos scripts Python en notebooks Jupyter professionnels, documentes et prets pour la presentation avec Claude AI.",
-  keywords: [
-    "python",
-    "jupyter",
-    "notebook",
-    "converter",
-    "ai",
-    "claude",
-    "jupytext",
-    "data science",
-  ],
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: `${APP_NAME} — ${APP_DESCRIPTION}`,
+    template: `%s | ${APP_NAME}`,
+  },
+  description: `${APP_DESCRIPTION}. Collez votre code Python, l'IA ajoute des explications structurées, et téléchargez un .ipynb prêt à l'emploi.`,
+  keywords: SEO_KEYWORDS,
+  authors: [{ name: APP_NAME }],
+  creator: APP_NAME,
+  publisher: APP_NAME,
+  category: "developer tools",
   openGraph: {
-    title: "Py2Nb - Python to Notebook avec IA",
-    description:
-      "Transformez vos scripts Python en notebooks Jupyter professionnels avec Claude AI.",
     type: "website",
+    locale: "fr_FR",
+    url: APP_URL,
+    siteName: APP_NAME,
+    title: `${APP_NAME} — ${APP_DESCRIPTION}`,
+    description:
+      "Collez votre script Python, l'IA génère un notebook Jupyter documenté et professionnel. Gratuit jusqu'à 3 conversions/mois.",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: `${APP_NAME} — Convertisseur Python vers Jupyter Notebook`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${APP_NAME} — ${APP_DESCRIPTION}`,
+    description:
+      "Collez votre script Python, l'IA génère un notebook Jupyter documenté et professionnel.",
+    images: ["/opengraph-image"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  alternates: {
+    canonical: APP_URL,
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 

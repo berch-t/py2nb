@@ -8,8 +8,15 @@ import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
-const navLinks = [
-  { label: "Convertir", href: "/convert" },
+interface NavLink {
+  label: string;
+  href: string;
+  auth?: boolean;
+  highlight?: boolean;
+}
+
+const navLinks: NavLink[] = [
+  { label: "Convertir", href: "/convert", highlight: true },
   { label: "Tarifs", href: "/pricing" },
   { label: "Dashboard", href: "/dashboard", auth: true },
 ];
@@ -32,7 +39,7 @@ export function Header() {
             priority
           />
           <span
-            className="text-4xl font-bold bg-gradient-to-b from-zinc-300 to-zinc-300 font-mono text-transparent bg-clip-text"
+            className="text-3xl font-bold bg-gradient-to-b from-zinc-300 to-zinc-300 font-mono text-transparent bg-clip-text"
           >
             /py2nb
           </span>
@@ -48,7 +55,9 @@ export function Header() {
                 className={`text-sm font-medium transition-colors ${
                   pathname === link.href
                     ? "text-white"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    : link.highlight
+                      ? "text-indigo-300 hover:text-indigo-200"
+                      : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
                 {link.label}
@@ -74,7 +83,7 @@ export function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block py-2 text-sm text-zinc-300"
+                className={`block py-2 text-sm ${link.highlight ? "text-indigo-300" : "text-zinc-300"}`}
               >
                 {link.label}
               </Link>
