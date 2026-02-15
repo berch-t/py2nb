@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { Badge } from "@/components/ui/badge";
-import { Zap } from "lucide-react";
+import { Zap, CreditCard } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
+import { PLAN_CONVERSION_LIMITS } from "@/lib/constants";
 
 interface ConversionCounterProps {
   conversionsUsed: number;
@@ -15,13 +16,16 @@ export function ConversionCounter({
   plan,
 }: ConversionCounterProps) {
   const { user } = useAuthStore();
-  const planLimits: Record<string, number> = {
-    free: 3,
-    pro: 50,
-    premium: Infinity,
-  };
-  const limit = planLimits[plan] ?? 3;
-  const remaining = Math.max(0, limit - conversionsUsed);
+
+  // Non-connected users: pay-per-use, no counter
+  if (!user) {
+    return (
+      <Badge variant="secondary" className="gap-1.5">
+        <CreditCard className="h-3 w-3" />
+        Paiement a l&apos;usage
+      </Badge>
+    );
+  }
 
   if (plan === "premium") {
     return (
@@ -31,6 +35,9 @@ export function ConversionCounter({
       </Badge>
     );
   }
+
+  const limit = PLAN_CONVERSION_LIMITS[plan] ?? PLAN_CONVERSION_LIMITS.free;
+  const remaining = Math.max(0, limit - conversionsUsed);
 
   return (
     <AnimatePresence mode="wait">

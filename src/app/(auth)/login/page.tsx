@@ -40,6 +40,7 @@ function LoginForm() {
   const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   const [isSignup, setIsSignup] = useState(searchParams.get("mode") === "signup");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -50,13 +51,13 @@ function LoginForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    if (user) router.replace("/");
-  }, [user, router]);
+    if (user) router.replace(redirect);
+  }, [user, router, redirect]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await loginWithGoogle();
+      await loginWithGoogle(redirect);
     } catch (error) {
       toast.error(getFirebaseErrorMessage(error));
       setLoading(false);
@@ -73,9 +74,9 @@ function LoginForm() {
     setLoading(true);
     try {
       if (isSignup) {
-        await signupWithEmail(email, password, displayName);
+        await signupWithEmail(email, password, displayName, redirect);
       } else {
-        await loginWithEmail(email, password);
+        await loginWithEmail(email, password, redirect);
       }
     } catch (error) {
       toast.error(getFirebaseErrorMessage(error));

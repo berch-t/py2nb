@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
+import { PLAN_CONVERSION_LIMITS } from "@/lib/constants";
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
       conversionsThisMonth: userData.conversionsThisMonth || 0,
       totalTokensUsed: userData.totalTokensUsed || 0,
       conversionsLimit:
-        userData.plan === "free" ? 3 : Infinity,
+        PLAN_CONVERSION_LIMITS[userData.plan || "free"] ?? PLAN_CONVERSION_LIMITS.free,
       conversions,
     });
   } catch (error) {

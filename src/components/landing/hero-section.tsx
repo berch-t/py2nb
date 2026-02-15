@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
 export function HeroSection() {
@@ -49,14 +49,12 @@ export function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.15 }}
-          className="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl"
+          className="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl font-mono"
         >
           Python &rarr;{" "}
-          <span className="inline-block bg-gradient-to-b from-zinc-200 to-indigo-400 bg-clip-text pb-[4px] text-transparent">
+          <span className="inline-block bg-gradient-to-b from-zinc-200 to-indigo-400 bg-clip-text pb-[4px] font-mono text-transparent">
             Notebook
           </span>
-          <br />
-          en un clic
         </motion.h1>
 
         <motion.p
@@ -65,8 +63,8 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400 sm:text-xl"
         >
-          Transformez vos scripts Python en notebooks Jupyter professionnels,
-          document&eacute;s et pr&ecirc;ts pour la pr&eacute;sentation. L&apos;IA analyse, commente et
+          Des notebooks qui racontent votre raisonnement : <br />
+          Document&eacute;s et pr&ecirc;ts pour la pr&eacute;sentation.<br /> Nôtre IA analyse, commente et
           structure votre code automatiquement.
         </motion.p>
 
@@ -77,7 +75,7 @@ export function HeroSection() {
           className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
         >
           <Button size="lg" asChild className="gap-2 text-base">
-            <Link href="#converter">
+            <Link href="/convert">
               Essayer maintenant
               <ArrowRight className="h-4 w-4" />
             </Link>

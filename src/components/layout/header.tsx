@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AuthButton } from "@/components/auth/auth-button";
-import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/auth-store";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const navLinks = [
-  { label: "Convertir", href: "/#converter" },
+  { label: "Convertir", href: "/convert" },
   { label: "Tarifs", href: "/pricing" },
   { label: "Dashboard", href: "/dashboard", auth: true },
 ];
@@ -33,9 +32,9 @@ export function Header() {
             priority
           />
           <span
-            className="text-3xl font-bold bg-gradient-to-b from-zinc-500 to-indigo-300 text-transparent bg-clip-text"
+            className="text-4xl font-bold bg-gradient-to-b from-zinc-300 to-zinc-300 font-mono text-transparent bg-clip-text"
           >
-            Py2Nb
+            /py2nb
           </span>
         </Link>
 
@@ -46,16 +45,8 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={(e) => {
-                  if (link.href.startsWith("/#") && pathname === "/") {
-                    e.preventDefault();
-                    document
-                      .getElementById(link.href.slice(2))
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
                 className={`text-sm font-medium transition-colors ${
-                  pathname === link.href || (link.href === "/#converter" && pathname === "/")
+                  pathname === link.href
                     ? "text-white"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
@@ -82,15 +73,7 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={(e) => {
-                  setMobileOpen(false);
-                  if (link.href.startsWith("/#") && pathname === "/") {
-                    e.preventDefault();
-                    document
-                      .getElementById(link.href.slice(2))
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
+                onClick={() => setMobileOpen(false)}
                 className="block py-2 text-sm text-zinc-300"
               >
                 {link.label}

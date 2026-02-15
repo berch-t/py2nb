@@ -70,16 +70,22 @@ const plans = [
 ];
 
 export function PricingCards() {
-  const { user, loginWithGoogle } = useAuthStore();
+  const { user } = useAuthStore();
   const [billingInterval, setBillingInterval] = useState<BillingInterval>("monthly");
 
   const handleCheckout = async (priceId: string | undefined) => {
     if (!user) {
-      await loginWithGoogle();
+      // Redirect to login, then back to pricing (paid) or convert (free)
+      const redirect = priceId ? "/pricing" : "/convert";
+      window.location.href = `/login?redirect=${redirect}`;
       return;
     }
 
-    if (!priceId) return;
+    // Free plan — already logged in, go to converter
+    if (!priceId) {
+      window.location.href = "/convert";
+      return;
+    }
 
     const token = Cookies.get("firebase-auth-token");
     const res = await fetch("/api/stripe/checkout", {

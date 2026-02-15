@@ -167,7 +167,7 @@ export default function DashboardPage() {
                   Aucune conversion pour le moment
                 </p>
                 <Button asChild className="mt-4" variant="outline">
-                  <Link href="/#converter">Faire une conversion</Link>
+                  <Link href="/convert">Faire une conversion</Link>
                 </Button>
               </div>
             ) : (

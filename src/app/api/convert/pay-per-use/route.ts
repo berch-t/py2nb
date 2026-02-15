@@ -82,8 +82,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${appUrl}/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/?canceled=true`,
+      success_url: `${appUrl}/convert?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/convert?canceled=true`,
       metadata: {
         pendingConversionId: pendingId,
         type: "pay_per_use_conversion",

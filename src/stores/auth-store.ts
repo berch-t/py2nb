@@ -22,9 +22,9 @@ interface AuthState {
   loading: boolean;
   initialized: boolean;
   hydrate: () => void;
-  loginWithGoogle: () => Promise<void>;
-  loginWithEmail: (email: string, password: string) => Promise<void>;
-  signupWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
+  loginWithGoogle: (redirectTo?: string) => Promise<void>;
+  loginWithEmail: (email: string, password: string, redirectTo?: string) => Promise<void>;
+  signupWithEmail: (email: string, password: string, displayName: string, redirectTo?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -81,36 +81,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  loginWithGoogle: async () => {
+  loginWithGoogle: async (redirectTo = "/") => {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
 
     if (isMobile()) {
+      sessionStorage.setItem("auth-redirect", redirectTo);
       await signInWithRedirect(auth, provider);
     } else {
       const cred = await signInWithPopup(auth, provider);
       const token = await cred.user.getIdToken();
       Cookies.set("firebase-auth-token", token, { expires: 7 });
-      // Full reload after popup (COOP workaround)
-      window.location.href = "/";
+      window.location.href = redirectTo;
     }
   },
 
-  loginWithEmail: async (email: string, password: string) => {
+  loginWithEmail: async (email: string, password: string, redirectTo = "/") => {
     const auth = getAuth();
     const cred = await signInWithEmailAndPassword(auth, email, password);
     const token = await cred.user.getIdToken();
     Cookies.set("firebase-auth-token", token, { expires: 7 });
-    window.location.href = "/";
+    window.location.href = redirectTo;
   },
 
-  signupWithEmail: async (email: string, password: string, displayName: string) => {
+  signupWithEmail: async (email: string, password: string, displayName: string, redirectTo = "/") => {
     const auth = getAuth();
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName });
     const token = await cred.user.getIdToken();
     Cookies.set("firebase-auth-token", token, { expires: 7 });
-    window.location.href = "/";
+    window.location.href = redirectTo;
   },
 
   logout: async () => {
