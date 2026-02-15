@@ -65,7 +65,7 @@ export function CodeInput({ value, onChange, disabled }: CodeInputProps) {
         onDrop={handleDrop}
         className={`relative rounded-xl border-2 border-dashed transition-colors ${
           isDragging
-            ? "border-indigo-500 bg-indigo-500/10"
+            ? "border-zinc-400 bg-zinc-500/10"
             : "border-zinc-700 hover:border-zinc-600"
         }`}
       >

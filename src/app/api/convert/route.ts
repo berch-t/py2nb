@@ -72,11 +72,24 @@ export async function POST(request: NextRequest) {
 
     const userData = userSnap.data()!;
     const plan = userData.plan || "free";
+    const conversionsUsed = userData.conversionsUsed || 0;
 
-    if (plan === "free" && userData.conversionsUsed >= 3) {
+    // Check limits per plan
+    const planLimits: Record<string, number> = {
+      free: 3,
+      pro: 50,
+      premium: Infinity,
+    };
+    const limit = planLimits[plan] ?? 3;
+
+    if (conversionsUsed >= limit) {
+      const upgradeMsg =
+        plan === "free"
+          ? "Passez au plan Pro pour 50 conversions/mois !"
+          : "Limite de conversions atteinte pour ce mois.";
       return NextResponse.json(
         {
-          error: "Limite de conversions atteinte. Passez au plan Pro !",
+          error: `Limite de conversions atteinte (${conversionsUsed}/${limit}). ${upgradeMsg}`,
           code: "LIMIT_REACHED",
         },
         { status: 403 }

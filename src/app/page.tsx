@@ -31,8 +31,37 @@ function HomeContent() {
   const [fileName, setFileName] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [result, setResult] = useState<ConvertResult | null>(null);
   const [conversionsUsed, setConversionsUsed] = useState(0);
+  const [userPlan, setUserPlan] = useState<string>("free");
+
+  // Fetch usage data when user is logged in
+  useEffect(() => {
+    if (!user) {
+      setConversionsUsed(0);
+      setUserPlan("free");
+      return;
+    }
+
+    const fetchUsage = async () => {
+      try {
+        const token = Cookies.get("firebase-auth-token");
+        const res = await fetch("/api/usage", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setConversionsUsed(data.conversionsUsed || 0);
+          setUserPlan(data.plan || "free");
+        }
+      } catch {
+        // Silent fail - counter will show 0
+      }
+    };
+
+    fetchUsage();
+  }, [user]);
 
   // Auto-download notebook
   const triggerDownload = useCallback(
@@ -67,11 +96,29 @@ function HomeContent() {
     // Clean URL immediately to prevent double processing on refresh
     window.history.replaceState({}, "", "/");
 
+    // Scroll to converter section
+    setTimeout(() => {
+      document.getElementById("converter")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+
     const processPayment = async () => {
       setLoading(true);
-      setLoadingMessage("Paiement verifie. Conversion en cours...");
+      setLoadingProgress(10);
+      setLoadingMessage("Verification du paiement...");
 
       try {
+        setLoadingProgress(20);
+        setLoadingMessage("Paiement confirme. Lancement de la conversion...");
+
+        // Simulate progress while waiting for API
+        const progressInterval = setInterval(() => {
+          setLoadingProgress((prev) => {
+            if (prev >= 85) return prev;
+            return prev + Math.random() * 8;
+          });
+        }, 800);
+
+        setLoadingProgress(30);
         setLoadingMessage("Analyse de votre code par Claude AI...");
 
         const res = await fetch("/api/convert/process-payment", {
@@ -80,14 +127,20 @@ function HomeContent() {
           body: JSON.stringify({ sessionId }),
         });
 
+        clearInterval(progressInterval);
+
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.error || "Erreur de conversion");
         }
 
+        setLoadingProgress(90);
         setLoadingMessage("Generation du notebook...");
 
         const data = await res.json();
+
+        setLoadingProgress(100);
+        setLoadingMessage("Terminé !");
 
         setResult({
           notebook: data.notebook,
@@ -110,6 +163,7 @@ function HomeContent() {
       } finally {
         setLoading(false);
         setLoadingMessage("");
+        setLoadingProgress(0);
       }
     };
 
@@ -125,13 +179,22 @@ function HomeContent() {
     // Flow 1: User connecte
     if (user) {
       setLoading(true);
-      setLoadingMessage("Conversion en cours...");
+      setLoadingProgress(10);
+      setLoadingMessage("Envoi du code...");
       setResult(null);
 
       try {
         const token = Cookies.get("firebase-auth-token");
 
+        setLoadingProgress(20);
         setLoadingMessage("Analyse de votre code par Claude AI...");
+
+        const progressInterval = setInterval(() => {
+          setLoadingProgress((prev) => {
+            if (prev >= 85) return prev;
+            return prev + Math.random() * 8;
+          });
+        }, 800);
 
         const res = await fetch("/api/convert", {
           method: "POST",
@@ -142,14 +205,20 @@ function HomeContent() {
           body: JSON.stringify({ code, fileName }),
         });
 
+        clearInterval(progressInterval);
+
         if (!res.ok) {
           const err = await res.json();
           throw new Error(err.error || "Erreur de conversion");
         }
 
+        setLoadingProgress(90);
         setLoadingMessage("Generation du notebook...");
 
         const data: ConvertResult = await res.json();
+
+        setLoadingProgress(100);
+
         setResult(data);
         setConversionsUsed((prev) => prev + 1);
         toast.success(
@@ -162,6 +231,7 @@ function HomeContent() {
       } finally {
         setLoading(false);
         setLoadingMessage("");
+        setLoadingProgress(0);
       }
       return;
     }
@@ -180,9 +250,12 @@ function HomeContent() {
     if (!confirmed) return;
 
     setLoading(true);
+    setLoadingProgress(10);
     setLoadingMessage("Preparation du paiement...");
 
     try {
+      setLoadingProgress(30);
+
       const res = await fetch("/api/convert/pay-per-use", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -196,6 +269,7 @@ function HomeContent() {
 
       const data = await res.json();
 
+      setLoadingProgress(60);
       setLoadingMessage("Redirection vers Stripe...");
 
       // Redirect to Stripe Checkout
@@ -206,6 +280,7 @@ function HomeContent() {
       toast.error(message);
       setLoading(false);
       setLoadingMessage("");
+      setLoadingProgress(0);
     }
   };
 
@@ -228,7 +303,7 @@ function HomeContent() {
                 Collez votre script Python ou uploadez un fichier .py
               </p>
             </div>
-            <ConversionCounter conversionsUsed={conversionsUsed} plan="free" />
+            <ConversionCounter conversionsUsed={conversionsUsed} plan={userPlan} />
           </div>
 
           <div className="grid gap-8 lg:grid-cols-2">
@@ -246,15 +321,27 @@ function HomeContent() {
                 loading={loading}
                 disabled={!code.trim()}
               />
-              {/* Loading message */}
+              {/* Progress bar */}
               {loading && loadingMessage && (
                 <motion.div
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-4"
+                  className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 p-4"
                 >
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
-                  <p className="text-sm text-zinc-300">{loadingMessage}</p>
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-sm font-medium text-zinc-200">{loadingMessage}</p>
+                    <span className="text-sm font-mono text-zinc-300">
+                      {Math.round(loadingProgress)}%
+                    </span>
+                  </div>
+                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-800">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-zinc-500 to-zinc-300"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${loadingProgress}%` }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                  </div>
                 </motion.div>
               )}
               {/* Pay-per-use price indicator */}
@@ -267,7 +354,7 @@ function HomeContent() {
                     "1.99€"}
                   {code.split("\n").length > 1000 && "3.99€"}
                   {" "}&bull; Ou{" "}
-                  <a href="/login" className="text-indigo-400 hover:underline">
+                  <a href="/login" className="text-zinc-300 hover:underline">
                     connectez-vous
                   </a>
                   {" "}pour 3 conversions gratuites
@@ -330,7 +417,7 @@ export default function HomePage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-400 border-t-transparent" />
         </div>
       }
     >

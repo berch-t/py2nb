@@ -136,8 +136,8 @@ export default function DashboardPage() {
             >
               <Card>
                 <CardContent className="flex items-center gap-4 p-4">
-                  <div className="rounded-lg bg-indigo-600/10 p-2.5">
-                    <stat.icon className="h-5 w-5 text-indigo-400" />
+                  <div className="rounded-lg bg-zinc-700/20 p-2.5">
+                    <stat.icon className="h-5 w-5 text-zinc-300" />
                   </div>
                   <div>
                     <p className="text-xs text-zinc-500">{stat.label}</p>

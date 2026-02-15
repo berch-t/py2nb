@@ -27,8 +27,8 @@ export function AuthButton() {
             className="rounded-full"
           />
         ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600">
-            <User className="h-4 w-4 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-200">
+            <User className="h-4 w-4 text-zinc-950" />
           </div>
         )}
         <span className="hidden text-sm text-zinc-300 sm:inline">

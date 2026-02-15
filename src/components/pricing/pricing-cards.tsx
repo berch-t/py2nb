@@ -100,41 +100,51 @@ export function PricingCards() {
   return (
     <div className="space-y-8">
       {/* Billing toggle */}
-      <div className="flex items-center justify-center gap-4">
-        <span
-          className={`text-sm font-medium ${
-            billingInterval === "monthly" ? "text-white" : "text-zinc-500"
-          }`}
-        >
-          Mensuel
-        </span>
-        <button
-          onClick={() =>
-            setBillingInterval(billingInterval === "monthly" ? "yearly" : "monthly")
-          }
-          className={`relative h-7 w-14 rounded-full transition-colors ${
-            billingInterval === "yearly" ? "bg-indigo-600" : "bg-zinc-700"
-          }`}
-        >
+      <div className="relative flex items-center justify-center">
+        <div className="flex items-center gap-4">
           <span
-            className={`absolute top-0.5 h-6 w-6 rounded-full bg-white transition-transform ${
-              billingInterval === "yearly" ? "translate-x-7" : "translate-x-0.5"
+            className={`text-sm font-medium transition-colors ${
+              billingInterval === "monthly" ? "text-indigo-200" : "text-zinc-500"
             }`}
-          />
-        </button>
-        <span
-          className={`text-sm font-medium ${
-            billingInterval === "yearly" ? "text-white" : "text-zinc-500"
-          }`}
-        >
-          Annuel
-        </span>
-        {billingInterval === "yearly" && (
-          <Badge variant="secondary" className="ml-2">
+          >
+            Mensuel
+          </span>
+          <button
+            onClick={() =>
+              setBillingInterval(billingInterval === "monthly" ? "yearly" : "monthly")
+            }
+            className={`relative h-7 w-14 shrink-0 rounded-full transition-colors ${
+              billingInterval === "yearly" ? "bg-indigo-200" : "bg-zinc-700"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                billingInterval === "yearly" ? "translate-x-7" : "translate-x-0"
+              }`}
+            />
+          </button>
+          <span
+            className={`text-sm font-medium transition-colors ${
+              billingInterval === "yearly" ? "text-indigo-200" : "text-zinc-500"
+            }`}
+          >
+            Annuel
+          </span>
+        </div>
+        {/* Badge positionné en absolu pour ne pas décaler le toggle */}
+        <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2">
+          <Badge
+            variant="secondary"
+            className={`whitespace-nowrap transition-opacity duration-200 ${
+              billingInterval === "yearly" ? "opacity-100" : "opacity-0"
+            }`}
+          >
             2 mois gratuits
           </Badge>
-        )}
+        </div>
       </div>
+      {/* Spacer pour le badge positionné en absolu */}
+      <div className="h-4" />
 
       {/* Pricing cards */}
       <div className="grid gap-6 md:grid-cols-3">
@@ -155,7 +165,7 @@ export function PricingCards() {
               <Card
                 className={`relative flex h-full flex-col ${
                   plan.popular
-                    ? "border-indigo-500 shadow-lg shadow-indigo-500/10"
+                    ? "border-indigo-200 shadow-lg shadow-zinc-400/10"
                     : ""
                 }`}
               >
@@ -167,18 +177,23 @@ export function PricingCards() {
 
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <plan.icon className="h-5 w-5 text-indigo-400" />
+                    <plan.icon className="h-5 w-5 text-zinc-300" />
                     <CardTitle>{plan.name}</CardTitle>
                   </div>
-                  <p className="text-sm text-zinc-500">{plan.description}</p>
+                  <p className="text-sm text-indigo-200">{plan.description}</p>
                   <div className="mt-4">
                     <span className="text-4xl font-bold text-white">{price}&euro;</span>
                     <span className="text-zinc-500">{plan.name === "Free" ? "" : period}</span>
                   </div>
                   {billingInterval === "yearly" && plan.name !== "Free" && (
-                    <p className="text-xs text-zinc-400 mt-1">
-                      Soit {(parseFloat(price) / 12).toFixed(2)}€/mois
-                    </p>
+                    <>
+                      <p className="text-xs text-zinc-400 mt-1">
+                        Soit {(parseFloat(price) / 12).toFixed(2)}€/mois
+                      </p>
+                      <Badge className="mt-2 w-38 border-transparent bg-emerald-400 text-zinc-800">
+                        -16% soit 2 mois offerts
+                      </Badge>
+                    </>
                   )}
                 </CardHeader>
 

@@ -92,8 +92,8 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600">
-          <Code2 className="h-6 w-6 text-white" />
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-200">
+          <Code2 className="h-6 w-6 text-zinc-950" />
         </div>
         <CardTitle className="text-2xl">
           {isSignup ? "Creer un compte" : "Bienvenue sur Py2Nb"}
@@ -227,7 +227,7 @@ function LoginForm() {
           <button
             type="button"
             onClick={toggleMode}
-            className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="font-medium text-zinc-300 hover:text-zinc-100 transition-colors"
           >
             {isSignup ? "Se connecter" : "S'inscrire"}
           </button>

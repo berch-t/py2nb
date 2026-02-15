@@ -78,8 +78,8 @@ export function FeaturesSection() {
               transition={{ delay: index * 0.1 }}
               className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 transition-colors hover:border-zinc-700 hover:bg-zinc-900/50"
             >
-              <div className="mb-4 inline-flex rounded-lg bg-indigo-600/10 p-2.5">
-                <feature.icon className="h-5 w-5 text-indigo-400" />
+              <div className="mb-4 inline-flex rounded-lg bg-zinc-700/20 p-2.5">
+                <feature.icon className="h-5 w-5 text-indigo-300" />
               </div>
               <h3 className="mb-2 font-semibold text-white">
                 {feature.title}

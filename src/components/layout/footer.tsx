@@ -7,8 +7,8 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600">
-              <Code2 className="h-4 w-4 text-white" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-200">
+              <Code2 className="h-4 w-4 text-zinc-950" />
             </div>
             <span className="font-bold text-white">Py2Nb</span>
           </div>

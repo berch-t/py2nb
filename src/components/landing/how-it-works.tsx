@@ -53,10 +53,10 @@ export function HowItWorks() {
               className="relative text-center"
             >
               {index < steps.length - 1 && (
-                <div className="absolute right-0 top-12 hidden h-px w-full translate-x-1/2 bg-gradient-to-r from-zinc-700 to-transparent md:block" />
+                <div className="absolute right-0 top-8 hidden h-px w-full translate-x-[65%] bg-gradient-to-r from-zinc-700 to-transparent md:block" />
               )}
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600/10 ring-1 ring-indigo-500/20">
-                <step.icon className="h-7 w-7 text-indigo-400" />
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-700/20 ring-1 ring-zinc-500/20">
+                <step.icon className="h-7 w-7 text-indigo-300" />
               </div>
               <h3 className="mb-2 text-lg font-semibold text-white">
                 {step.title}
