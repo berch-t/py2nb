@@ -24,9 +24,12 @@ export async function convertToNotebook(
 
     await writeFile(pyFile, pythonContent, "utf-8");
 
-    // Use uvx for isolated execution (no global install needed)
-    // Falls back to direct jupytext if uvx not available
+    // Try multiple jupytext execution methods
+    // 1. python3 -m jupytext (most reliable, uses system-installed jupytext)
+    // 2. uvx jupytext (isolated execution via uv)
+    // 3. jupytext (direct command if in PATH)
     const commands = [
+      `python3 -m jupytext --to notebook "${pyFile}" -o "${ipynbFile}"`,
       `uvx jupytext --to notebook "${pyFile}" -o "${ipynbFile}"`,
       `jupytext --to notebook "${pyFile}" -o "${ipynbFile}"`,
     ];

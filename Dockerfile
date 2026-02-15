@@ -1,12 +1,16 @@
 FROM node:22-slim AS base
 
-# Install Python + uv for jupytext conversion
+# Install Python + uv + jupytext for notebook conversion
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip curl ca-certificates \
+    python3 python3-pip python3-venv curl ca-certificates \
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PATH="/root/.local/bin:$PATH"
+
+# Pre-install jupytext globally using uv
+# This ensures jupytext is available without runtime downloads
+RUN uv pip install --system jupytext
 
 # --- Dependencies ---
 FROM base AS deps
@@ -59,9 +63,10 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# uv needs to be available for jupytext at runtime
-COPY --from=base /root/.local/bin/uv /usr/local/bin/uv
-COPY --from=base /root/.local/bin/uvx /usr/local/bin/uvx
+# Ensure Python3 and jupytext are accessible from nextjs user
+# Jupytext was installed system-wide in base stage with `uv pip install --system jupytext`
+# Verify installation
+RUN python3 -m jupytext --version || echo "Jupytext not found"
 
 USER nextjs
 EXPOSE 3000

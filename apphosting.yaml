@@ -2,6 +2,14 @@
 # Ce fichier peut être commité en toute sécurité dans Git.
 # Les secrets sont stockés dans Cloud Secret Manager et référencés ici.
 
+# Forcer l'utilisation du Dockerfile (pour installer Python + uv/jupytext)
+# Sans cela, Firebase App Hosting utilise les buildpacks qui ne détectent que Node.js
+# et le container Cloud Run n'aura pas uvx disponible
+# Voir: https://firebase.google.com/docs/app-hosting/configure
+build:
+  dockerfile:
+    path: Dockerfile
+
 # Paramètres Cloud Run
 runConfig:
   minInstances: 0        # Scale to zero pour économies
