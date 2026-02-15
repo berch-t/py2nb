@@ -2,13 +2,8 @@
 # Ce fichier peut être commité en toute sécurité dans Git.
 # Les secrets sont stockés dans Cloud Secret Manager et référencés ici.
 
-# Forcer l'utilisation du Dockerfile (pour installer Python + uv/jupytext)
-# Sans cela, Firebase App Hosting utilise les buildpacks qui ne détectent que Node.js
-# et le container Cloud Run n'aura pas uvx disponible
-# Voir: https://firebase.google.com/docs/app-hosting/configure
-build:
-  dockerfile:
-    path: Dockerfile
+# Conversion notebook: Pure TypeScript (pas besoin de Python/Jupytext)
+# Firebase App Hosting utilise des buildpacks Node.js automatiques
 
 # Paramètres Cloud Run
 runConfig:
@@ -123,12 +118,29 @@ env:
     availability:
       - RUNTIME
 
-  - variable: STRIPE_PRO_PRICE_ID
-    value: prod_TymXqK3FiYcXCg
+  # Stripe Price IDs (à créer dans Stripe Dashboard)
+  # Pro: 9.99€/mois ou 99.99€/an (50 conversions/mois)
+  - variable: NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_MONTHLY
+    value: price_1T1432ApPIHMnuGKHZdC31Wm
     availability:
+      - BUILD
       - RUNTIME
 
-  - variable: STRIPE_PREMIUM_PRICE_ID
-    value: prod_TymValL5YRTCUh
+  - variable: NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_YEARLY
+    value: price_1T141uApPIHMnuGKVkoNExUi
     availability:
+      - BUILD
+      - RUNTIME
+
+  # Premium: 29.99€/mois ou 299.99€/an (illimité)
+  - variable: NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID_MONTHLY
+    value: price_1T14AnApPIHMnuGKamILvmAN
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID_YEARLY
+    value: price_1T14BJApPIHMnuGKbwrBHTyy
+    availability:
+      - BUILD
       - RUNTIME

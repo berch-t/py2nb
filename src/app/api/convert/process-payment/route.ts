@@ -7,20 +7,17 @@ import { convertToNotebook } from "@/lib/jupytext";
 export const maxDuration = 60;
 
 /**
- * Endpoint de callback après paiement Stripe (pay-per-use)
+ * POST /api/convert/process-payment
  *
- * Flow :
- * 1. Vérifie le paiement Stripe avec session_id
- * 2. Récupère le code depuis Firestore
- * 3. Lance la conversion (Claude + Jupytext)
- * 4. Retourne le notebook en JSON (pour téléchargement direct)
+ * Appelé par le frontend après redirection Stripe.
+ * Vérifie le paiement, lance la conversion Claude + Jupytext TS, retourne le notebook.
  */
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const sessionId = searchParams.get("session_id");
+    const body = await request.json();
+    const { sessionId } = body as { sessionId: string };
 
     if (!sessionId) {
       return NextResponse.json(
@@ -57,19 +54,24 @@ export async function GET(request: NextRequest) {
 
     if (!pendingSnap.exists) {
       return NextResponse.json(
-        { error: "Conversion expirée ou introuvable", code: "NOT_FOUND" },
+        { error: "Conversion expiree ou introuvable", code: "NOT_FOUND" },
         { status: 404 }
       );
     }
 
     const pendingData = pendingSnap.data()!;
 
-    // Check if already processed
-    if (pendingData.status === "completed") {
-      // Return cached result
+    // Check if already processed (idempotent)
+    if (pendingData.status === "completed" && pendingData.outputNotebook) {
+      const notebook = JSON.parse(pendingData.outputNotebook);
       return NextResponse.json({
-        notebook: JSON.parse(pendingData.outputNotebook),
-        fileName: pendingData.fileName || "notebook.ipynb",
+        notebook,
+        fileName: pendingData.fileName
+          ? pendingData.fileName.replace(/\.py$/, ".ipynb")
+          : "notebook.ipynb",
+        inputTokens: pendingData.claudeInputTokens || 0,
+        outputTokens: pendingData.claudeOutputTokens || 0,
+        processingTimeMs: pendingData.processingTimeMs || 0,
         alreadyProcessed: true,
       });
     }
@@ -77,11 +79,11 @@ export async function GET(request: NextRequest) {
     // Update status to processing
     await pendingRef.update({ status: "processing" });
 
-    // Convert with Claude
+    // Step 1: Call Claude API
     const claudeResult = await convertWithClaude(pendingData.code);
 
-    // Convert to .ipynb with Jupytext
-    const notebookJson = await convertToNotebook(claudeResult.content);
+    // Step 2: Convert percent-format to .ipynb JSON (pure TypeScript)
+    const notebookJson = convertToNotebook(claudeResult.content);
 
     const processingTimeMs = Date.now() - startTime;
 
@@ -98,7 +100,7 @@ export async function GET(request: NextRequest) {
     // Create anonymous conversion record for analytics
     const conversionRef = db.collection("conversions").doc();
     await conversionRef.set({
-      userId: null, // anonymous
+      userId: null,
       inputCode: pendingData.code,
       inputFileName: pendingData.fileName || null,
       inputLineCount: pendingData.lineCount,
@@ -115,95 +117,18 @@ export async function GET(request: NextRequest) {
       createdAt: new Date(),
     });
 
-    // Return notebook as downloadable JSON
+    // Return notebook JSON to frontend
     const notebook = JSON.parse(notebookJson);
     const fileName = pendingData.fileName
       ? pendingData.fileName.replace(/\.py$/, ".ipynb")
       : "notebook.ipynb";
 
-    // Return HTML with auto-download
-    const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Téléchargement du notebook</title>
-      <meta charset="UTF-8">
-      <style>
-        body {
-          font-family: system-ui, -apple-system, sans-serif;
-          background: #0a0a0a;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-center;
-          min-height: 100vh;
-          margin: 0;
-          padding: 20px;
-        }
-        .container {
-          text-align: center;
-          max-width: 600px;
-        }
-        h1 {
-          font-size: 24px;
-          margin-bottom: 16px;
-        }
-        p {
-          color: #a1a1aa;
-          margin-bottom: 24px;
-        }
-        .btn {
-          display: inline-block;
-          background: #6366f1;
-          color: #fff;
-          padding: 12px 24px;
-          border-radius: 8px;
-          text-decoration: none;
-          font-weight: 500;
-        }
-        .btn:hover {
-          background: #4f46e5;
-        }
-        .stats {
-          margin-top: 32px;
-          padding: 16px;
-          background: #18181b;
-          border-radius: 8px;
-          font-size: 14px;
-          color: #a1a1aa;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>✅ Conversion réussie !</h1>
-        <p>Votre notebook est prêt. Le téléchargement va commencer automatiquement...</p>
-        <a href="/" class="btn">Retour à l'accueil</a>
-        <div class="stats">
-          ${claudeResult.inputTokens + claudeResult.outputTokens} tokens • ${(processingTimeMs / 1000).toFixed(1)}s
-        </div>
-      </div>
-      <script>
-        const notebook = ${JSON.stringify(notebook)};
-        const fileName = ${JSON.stringify(fileName)};
-
-        // Auto-download
-        const blob = new Blob([JSON.stringify(notebook, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
-      </script>
-    </body>
-    </html>
-    `;
-
-    return new NextResponse(html, {
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-      },
+    return NextResponse.json({
+      notebook,
+      fileName,
+      inputTokens: claudeResult.inputTokens,
+      outputTokens: claudeResult.outputTokens,
+      processingTimeMs,
     });
   } catch (error) {
     console.error("Process payment error:", error);

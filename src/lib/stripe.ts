@@ -20,35 +20,41 @@ export const PLANS = {
     conversionsLimit: 3,
     price: 0,
     features: [
-      "3 conversions",
+      "3 conversions/mois",
       "Fichiers < 500 lignes",
       "Export .ipynb",
     ],
   },
   pro: {
     name: "Pro",
-    conversionsLimit: Infinity,
-    price: 1900, // centimes
-    priceId: process.env.STRIPE_PRO_PRICE_ID,
+    conversionsLimit: 50,
+    price: 999, // centimes/mois
+    priceMonthly: 999,
+    priceYearly: 9999, // 99.99€/an (2 mois gratuits)
+    priceIdMonthly: process.env.STRIPE_PRO_PRICE_ID_MONTHLY,
+    priceIdYearly: process.env.STRIPE_PRO_PRICE_ID_YEARLY,
     features: [
-      "Conversions illimitees",
-      "Fichiers sans limite",
-      "Streaming en temps reel",
-      "Tous les formats d'export",
-      "AI Prompt-to-Notebook",
+      "50 conversions/mois",
+      "Fichiers jusqu'a 5000 lignes",
+      "Export .ipynb",
+      "Historique des conversions",
+      "Priorite de traitement",
     ],
   },
   premium: {
     name: "Premium",
     conversionsLimit: Infinity,
-    price: 9900, // centimes
-    priceId: process.env.STRIPE_PREMIUM_PRICE_ID,
+    price: 2999, // centimes/mois
+    priceMonthly: 2999,
+    priceYearly: 29999, // 299.99€/an (2 mois gratuits)
+    priceIdMonthly: process.env.STRIPE_PREMIUM_PRICE_ID_MONTHLY,
+    priceIdYearly: process.env.STRIPE_PREMIUM_PRICE_ID_YEARLY,
     features: [
-      "Tout dans Pro",
-      "Chat NLP interactif",
-      "Batch processing",
-      "Acces API REST",
-      "Support prioritaire",
+      "Conversions illimitees",
+      "Fichiers sans limite de taille",
+      "Export multi-formats",
+      "API REST privee",
+      "Support prioritaire 24/7",
     ],
   },
 } as const;
@@ -56,8 +62,9 @@ export const PLANS = {
 export type PlanType = keyof typeof PLANS;
 
 // Pay-per-use pricing (centimes)
+// Prix ajustés pour couvrir les frais Stripe (1.5% + 0.25€)
 export function getPayPerUsePrice(lineCount: number): number {
-  if (lineCount < 200) return 20;
-  if (lineCount <= 1000) return 50;
-  return 100;
+  if (lineCount < 200) return 99;   // 0.99€ (net: ~0.72€)
+  if (lineCount <= 1000) return 199; // 1.99€ (net: ~1.71€)
+  return 399;                        // 3.99€ (net: ~3.69€)
 }
