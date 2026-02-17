@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Download, Copy, Check } from "lucide-react";
 
@@ -11,6 +12,7 @@ interface DownloadButtonProps {
 
 export function DownloadButton({ notebook, fileName }: DownloadButtonProps) {
   const [copied, setCopied] = useState(false);
+  const t = useTranslations("converter.download");
 
   const handleDownload = () => {
     const json = JSON.stringify(notebook, null, 2);
@@ -36,7 +38,7 @@ export function DownloadButton({ notebook, fileName }: DownloadButtonProps) {
     <div className="flex gap-2">
       <Button onClick={handleDownload} size="sm" className="gap-1.5">
         <Download className="h-3.5 w-3.5" />
-        Telecharger .ipynb
+        {t("download")}
       </Button>
       <Button
         onClick={handleCopy}
@@ -49,7 +51,7 @@ export function DownloadButton({ notebook, fileName }: DownloadButtonProps) {
         ) : (
           <Copy className="h-3.5 w-3.5" />
         )}
-        {copied ? "Copie !" : "Copier JSON"}
+        {copied ? t("copied") : t("copy")}
       </Button>
     </div>
   );

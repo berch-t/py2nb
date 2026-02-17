@@ -17,6 +17,13 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth, getDb } from "@/lib/firebase-client";
 import { isMobile } from "@/lib/utils";
 
+/** Extract the current locale prefix from window.location.pathname (e.g. "/en" or "/fr"). */
+function getCurrentLocalePrefix(): string {
+  if (typeof window === "undefined") return "/fr";
+  const match = window.location.pathname.match(/^\/(fr|en)/);
+  return match ? `/${match[1]}` : "/fr";
+}
+
 interface AuthState {
   user: User | null;
   loading: boolean;
@@ -84,6 +91,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   loginWithGoogle: async (redirectTo = "/") => {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
+    const localePrefix = getCurrentLocalePrefix();
 
     if (isMobile()) {
       sessionStorage.setItem("auth-redirect", redirectTo);
@@ -92,7 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const cred = await signInWithPopup(auth, provider);
       const token = await cred.user.getIdToken();
       Cookies.set("firebase-auth-token", token, { expires: 7 });
-      window.location.href = redirectTo;
+      window.location.href = `${localePrefix}${redirectTo}`;
     }
   },
 
@@ -101,7 +109,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const cred = await signInWithEmailAndPassword(auth, email, password);
     const token = await cred.user.getIdToken();
     Cookies.set("firebase-auth-token", token, { expires: 7 });
-    window.location.href = redirectTo;
+    const localePrefix = getCurrentLocalePrefix();
+    window.location.href = `${localePrefix}${redirectTo}`;
   },
 
   signupWithEmail: async (email: string, password: string, displayName: string, redirectTo = "/") => {
@@ -110,7 +119,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await updateProfile(cred.user, { displayName });
     const token = await cred.user.getIdToken();
     Cookies.set("firebase-auth-token", token, { expires: 7 });
-    window.location.href = redirectTo;
+    const localePrefix = getCurrentLocalePrefix();
+    window.location.href = `${localePrefix}${redirectTo}`;
   },
 
   logout: async () => {
@@ -118,6 +128,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await signOut(auth);
     Cookies.remove("firebase-auth-token");
     set({ user: null });
-    window.location.href = "/";
+    const localePrefix = getCurrentLocalePrefix();
+    window.location.href = `${localePrefix}/`;
   },
 }));

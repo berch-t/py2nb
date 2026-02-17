@@ -3,11 +3,28 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 
 export const alt =
-  "Py2Nb — Convertisseur Python vers Jupyter Notebook avec IA";
+  "Py2Nb — Python to Jupyter Notebook converter with AI";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OgImage() {
+const descriptions: Record<string, string> = {
+  fr: "Transformez vos scripts Python en notebooks Jupyter professionnels avec l\u2019IA",
+  en: "Transform your Python scripts into professional Jupyter notebooks with AI",
+};
+
+const bottomLabels: Record<string, string> = {
+  fr: "Gratuit",
+  en: "Free",
+};
+
+export default async function OgImage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const lang = locale === "en" ? "en" : "fr";
+
   return new ImageResponse(
     (
       <div
@@ -89,7 +106,7 @@ export default function OgImage() {
           >
             .py
           </div>
-          <div style={{ fontSize: 36, color: "#6366f1" }}>→</div>
+          <div style={{ fontSize: 36, color: "#6366f1" }}>{"\u2192"}</div>
           <div
             style={{
               padding: "12px 28px",
@@ -115,8 +132,7 @@ export default function OgImage() {
             lineHeight: 1.4,
           }}
         >
-          Transformez vos scripts Python en notebooks Jupyter professionnels
-          avec l&apos;IA
+          {descriptions[lang]}
         </div>
 
         {/* Bottom tag */}
@@ -131,10 +147,10 @@ export default function OgImage() {
           }}
         >
           <span>Claude AI</span>
-          <span>•</span>
+          <span>{"\u2022"}</span>
           <span>Jupytext</span>
-          <span>•</span>
-          <span>Gratuit</span>
+          <span>{"\u2022"}</span>
+          <span>{bottomLabels[lang]}</span>
         </div>
       </div>
     ),

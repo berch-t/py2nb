@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Zap, CreditCard } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
@@ -16,13 +17,13 @@ export function ConversionCounter({
   plan,
 }: ConversionCounterProps) {
   const { user } = useAuthStore();
+  const t = useTranslations("converter.counter");
 
-  // Non-connected users: pay-per-use, no counter
   if (!user) {
     return (
       <Badge variant="secondary" className="gap-1.5">
         <CreditCard className="h-3 w-3" />
-        Paiement a l&apos;usage
+        {t("payPerUse")}
       </Badge>
     );
   }
@@ -31,7 +32,7 @@ export function ConversionCounter({
     return (
       <Badge variant="secondary" className="gap-1.5">
         <Zap className="h-3 w-3" />
-        Premium - Illimite
+        {t("premium")}
       </Badge>
     );
   }
@@ -53,7 +54,7 @@ export function ConversionCounter({
           className="gap-1.5"
         >
           <Zap className="h-3 w-3" />
-          {conversionsUsed}/{limit} conversions
+          {t("conversions", { used: conversionsUsed, limit })}
         </Badge>
       </motion.div>
     </AnimatePresence>

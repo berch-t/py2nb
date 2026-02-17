@@ -1,60 +1,64 @@
-import Link from "next/link";
+"use client";
+
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Code2 } from "lucide-react";
 
 export function Footer() {
+  const t = useTranslations("footer");
+
   return (
-    <footer className="border-t border-zinc-800 bg-zinc-950 py-12">
+    <footer className="border-t border-zinc-200 bg-zinc-50 py-12 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-200">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-200">
               <Code2 className="h-4 w-4 text-zinc-950" />
             </div>
-            <span className="font-bold text-white">Py2Nb</span>
+            <span className="font-bold text-zinc-900 dark:text-white">Py2Nb</span>
           </div>
           <p className="mt-3 text-sm text-zinc-500">
-            Transformez vos scripts Python en notebooks Jupyter professionnels
-            avec l&apos;IA.
+            {t("description")}
           </p>
         </div>
         <div>
-          <h4 className="mb-3 font-semibold text-zinc-300">Produit</h4>
+          <h4 className="mb-3 font-semibold text-zinc-700 dark:text-zinc-300">{t("product")}</h4>
           <ul className="space-y-2 text-sm text-zinc-500">
             <li>
-              <Link href="/" className="hover:text-zinc-300">
-                Convertir
+              <Link href="/convert" className="hover:text-zinc-700 dark:hover:text-zinc-300">
+                {t("convert")}
               </Link>
             </li>
             <li>
-              <Link href="/pricing" className="hover:text-zinc-300">
-                Tarifs
+              <Link href="/pricing" className="hover:text-zinc-700 dark:hover:text-zinc-300">
+                {t("pricing")}
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h4 className="mb-3 font-semibold text-zinc-300">Legal</h4>
+          <h4 className="mb-3 font-semibold text-zinc-700 dark:text-zinc-300">{t("legal")}</h4>
           <ul className="space-y-2 text-sm text-zinc-500">
             <li>
-              <Link href="#" className="hover:text-zinc-300">
-                CGU
+              <Link href="#" className="hover:text-zinc-700 dark:hover:text-zinc-300">
+                {t("terms")}
               </Link>
             </li>
             <li>
-              <Link href="#" className="hover:text-zinc-300">
-                Confidentialite
+              <Link href="#" className="hover:text-zinc-700 dark:hover:text-zinc-300">
+                {t("privacy")}
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h4 className="mb-3 font-semibold text-zinc-300">Contact</h4>
+          <h4 className="mb-3 font-semibold text-zinc-700 dark:text-zinc-300">{t("contact")}</h4>
           <p className="text-sm text-zinc-500">contact@py2nb.com</p>
         </div>
       </div>
-      <div className="mx-auto mt-8 max-w-7xl border-t border-zinc-800 px-4 pt-8">
-        <p className="text-center text-xs text-zinc-600">
-          &copy; {new Date().getFullYear()} Py2Nb. Tous droits reserves.
+      <div className="mx-auto mt-8 max-w-7xl border-t border-zinc-200 px-4 pt-8 dark:border-zinc-800">
+        <p className="text-center text-xs text-zinc-400 dark:text-zinc-600">
+          {t("copyright", { year: new Date().getFullYear() })}
         </p>
       </div>
     </footer>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,26 +16,8 @@ import {
 import { Code2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-
-const FIREBASE_ERRORS: Record<string, string> = {
-  "auth/email-already-in-use": "Cette adresse email est deja utilisee.",
-  "auth/invalid-email": "Adresse email invalide.",
-  "auth/weak-password": "Le mot de passe doit contenir au moins 6 caracteres.",
-  "auth/user-not-found": "Aucun compte associe a cette adresse email.",
-  "auth/wrong-password": "Mot de passe incorrect.",
-  "auth/invalid-credential": "Email ou mot de passe incorrect.",
-  "auth/too-many-requests": "Trop de tentatives. Reessayez plus tard.",
-};
-
-function getFirebaseErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    const code = (error as { code?: string }).code;
-    if (code && FIREBASE_ERRORS[code]) return FIREBASE_ERRORS[code];
-    return error.message;
-  }
-  return "Une erreur est survenue.";
-}
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 function LoginForm() {
   const { user, loginWithGoogle, loginWithEmail, signupWithEmail } = useAuthStore();
@@ -44,6 +27,7 @@ function LoginForm() {
   const [isSignup, setIsSignup] = useState(searchParams.get("mode") === "signup");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const t = useTranslations("auth");
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,6 +37,19 @@ function LoginForm() {
   useEffect(() => {
     if (user) router.replace(redirect);
   }, [user, router, redirect]);
+
+  const getFirebaseErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+      const code = (error as { code?: string }).code;
+      if (code) {
+        const key = `errors.${code}` as Parameters<typeof t>[0];
+        const msg = t(key);
+        if (msg !== key) return msg;
+      }
+      return error.message;
+    }
+    return t("errors.default");
+  };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -67,7 +64,7 @@ function LoginForm() {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSignup && password !== confirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas.");
+      toast.error(t("passwordMismatch"));
       return;
     }
 
@@ -93,27 +90,25 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-200">
-          <Code2 className="h-6 w-6 text-zinc-950" />
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 dark:bg-zinc-200">
+          <Code2 className="h-6 w-6 text-indigo-600 dark:text-zinc-950" />
         </div>
         <CardTitle className="text-2xl">
-          {isSignup ? "Creer un compte" : "Bienvenue sur Py2Nb"}
+          {isSignup ? t("signupTitle") : t("loginTitle")}
         </CardTitle>
         <CardDescription>
-          {isSignup
-            ? "Inscrivez-vous pour commencer a convertir vos scripts Python"
-            : "Connectez-vous pour convertir vos scripts Python en notebooks professionnels"}
+          {isSignup ? t("signupDescription") : t("loginDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={handleEmailSubmit} className="space-y-4">
           {isSignup && (
             <div className="space-y-2">
-              <Label htmlFor="displayName">Nom</Label>
+              <Label htmlFor="displayName">{t("name")}</Label>
               <Input
                 id="displayName"
                 type="text"
-                placeholder="Votre nom"
+                placeholder={t("namePlaceholder")}
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 autoComplete="name"
@@ -123,11 +118,11 @@ function LoginForm() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="vous@exemple.com"
+              placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
@@ -136,7 +131,7 @@ function LoginForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -152,7 +147,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -160,7 +155,7 @@ function LoginForm() {
           </div>
           {isSignup && (
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type={showPassword ? "text" : "password"}
@@ -181,17 +176,19 @@ function LoginForm() {
             disabled={loading}
           >
             {loading
-              ? isSignup ? "Creation..." : "Connexion..."
-              : isSignup ? "Creer mon compte" : "Se connecter"}
+              ? isSignup ? t("signupLoading") : t("loginLoading")
+              : isSignup ? t("signupButton") : t("loginButton")}
           </Button>
         </form>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-zinc-700" />
+            <span className="w-full border-t border-zinc-300 dark:border-zinc-700" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-zinc-950 px-2 text-zinc-500">ou</span>
+            <span className="bg-white px-2 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-500">
+              {t("or")}
+            </span>
           </div>
         </div>
 
@@ -220,23 +217,22 @@ function LoginForm() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          Continuer avec Google
+          {t("googleButton")}
         </Button>
 
-        <p className="text-center text-sm text-zinc-400">
-          {isSignup ? "Deja un compte ?" : "Pas encore de compte ?"}{" "}
+        <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+          {isSignup ? t("alreadyAccount") : t("noAccount")}{" "}
           <button
             type="button"
             onClick={toggleMode}
-            className="font-medium text-zinc-300 hover:text-zinc-100 transition-colors"
+            className="font-medium text-zinc-700 hover:text-zinc-900 transition-colors dark:text-zinc-300 dark:hover:text-zinc-100"
           >
-            {isSignup ? "Se connecter" : "S'inscrire"}
+            {isSignup ? t("switchToLogin") : t("switchToSignup")}
           </button>
         </p>
 
-        <p className="text-center text-xs text-zinc-500">
-          En continuant, vous acceptez nos conditions d&apos;utilisation
-          et notre politique de confidentialite.
+        <p className="text-center text-xs text-zinc-400 dark:text-zinc-500">
+          {t("termsNotice")}
         </p>
       </CardContent>
     </Card>
@@ -248,7 +244,7 @@ export default function LoginPage() {
     <div className="flex min-h-[80vh] items-center justify-center px-4">
       <Suspense
         fallback={
-          <div className="h-96 w-full max-w-md animate-pulse rounded-xl bg-zinc-900" />
+          <div className="h-96 w-full max-w-md animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-900" />
         }
       >
         <LoginForm />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { CodeInput } from "@/components/converter/code-input";
@@ -10,6 +11,7 @@ import { NotebookPreview } from "@/components/converter/notebook-preview";
 import { ConversionCounter } from "@/components/converter/conversion-counter";
 import { DownloadButton } from "@/components/shared/download-button";
 import { useAuthStore } from "@/stores/auth-store";
+import { Link } from "@/i18n/navigation";
 import { motion } from "motion/react";
 
 interface ConvertResult {
@@ -23,6 +25,7 @@ interface ConvertResult {
 function ConvertContent() {
   const { user } = useAuthStore();
   const searchParams = useSearchParams();
+  const t = useTranslations("convert");
   const [code, setCode] = useState("");
   const [fileName, setFileName] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,6 @@ function ConvertContent() {
   const [conversionsUsed, setConversionsUsed] = useState(0);
   const [userPlan, setUserPlan] = useState<string>("free");
 
-  // Fetch usage data when user is logged in
   useEffect(() => {
     if (!user) {
       setConversionsUsed(0);
@@ -52,14 +54,13 @@ function ConvertContent() {
           setUserPlan(data.plan || "free");
         }
       } catch {
-        // Silent fail - counter will show 0
+        // Silent fail
       }
     };
 
     fetchUsage();
   }, [user]);
 
-  // Auto-download notebook
   const triggerDownload = useCallback(
     (notebook: Record<string, unknown>, name: string) => {
       const blob = new Blob([JSON.stringify(notebook, null, 2)], {
@@ -75,32 +76,29 @@ function ConvertContent() {
     []
   );
 
-  // Handle Stripe return: ?session_id=xxx
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
     const canceled = searchParams.get("canceled");
 
     if (canceled) {
-      toast.error("Paiement annule");
-      window.history.replaceState({}, "", "/convert");
+      toast.error(t("errors.paymentCanceled"));
+      window.history.replaceState({}, "", window.location.pathname);
       return;
     }
 
     if (!sessionId) return;
 
-    // Clean URL immediately to prevent double processing on refresh
-    window.history.replaceState({}, "", "/convert");
+    window.history.replaceState({}, "", window.location.pathname);
 
     const processPayment = async () => {
       setLoading(true);
       setLoadingProgress(10);
-      setLoadingMessage("Verification du paiement...");
+      setLoadingMessage(t("loading.verifyingPayment"));
 
       try {
         setLoadingProgress(20);
-        setLoadingMessage("Paiement confirme. Lancement de la conversion...");
+        setLoadingMessage(t("loading.paymentConfirmed"));
 
-        // Simulate progress while waiting for API
         const progressInterval = setInterval(() => {
           setLoadingProgress((prev) => {
             if (prev >= 85) return prev;
@@ -109,7 +107,7 @@ function ConvertContent() {
         }, 800);
 
         setLoadingProgress(30);
-        setLoadingMessage("Analyse de votre code par Claude AI...");
+        setLoadingMessage(t("loading.analyzing"));
 
         const res = await fetch("/api/convert/process-payment", {
           method: "POST",
@@ -121,16 +119,16 @@ function ConvertContent() {
 
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.error || "Erreur de conversion");
+          throw new Error(err.error || t("errors.conversionError"));
         }
 
         setLoadingProgress(90);
-        setLoadingMessage("Generation du notebook...");
+        setLoadingMessage(t("loading.generating"));
 
         const data = await res.json();
 
         setLoadingProgress(100);
-        setLoadingMessage("Terminé !");
+        setLoadingMessage(t("loading.done"));
 
         setResult({
           notebook: data.notebook,
@@ -140,15 +138,14 @@ function ConvertContent() {
           processingTimeMs: data.processingTimeMs,
         });
 
-        // Auto-download
         triggerDownload(data.notebook, data.fileName || "notebook.ipynb");
 
         toast.success(
-          `Notebook genere en ${(data.processingTimeMs / 1000).toFixed(1)}s !`
+          t("success", { time: (data.processingTimeMs / 1000).toFixed(1) })
         );
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "Erreur de conversion";
+          error instanceof Error ? error.message : t("errors.conversionError");
         toast.error(message);
       } finally {
         setLoading(false);
@@ -158,26 +155,25 @@ function ConvertContent() {
     };
 
     processPayment();
-  }, [searchParams, triggerDownload]);
+  }, [searchParams, triggerDownload, t]);
 
   const handleConvert = async () => {
     if (!code.trim()) {
-      toast.error("Veuillez coller du code Python");
+      toast.error(t("errors.emptyCode"));
       return;
     }
 
-    // Flow 1: User connecte
     if (user) {
       setLoading(true);
       setLoadingProgress(10);
-      setLoadingMessage("Envoi du code...");
+      setLoadingMessage(t("loading.sending"));
       setResult(null);
 
       try {
         const token = Cookies.get("firebase-auth-token");
 
         setLoadingProgress(20);
-        setLoadingMessage("Analyse de votre code par Claude AI...");
+        setLoadingMessage(t("loading.analyzing"));
 
         const progressInterval = setInterval(() => {
           setLoadingProgress((prev) => {
@@ -199,11 +195,11 @@ function ConvertContent() {
 
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.error || "Erreur de conversion");
+          throw new Error(err.error || t("errors.conversionError"));
         }
 
         setLoadingProgress(90);
-        setLoadingMessage("Generation du notebook...");
+        setLoadingMessage(t("loading.generating"));
 
         const data: ConvertResult = await res.json();
 
@@ -212,11 +208,11 @@ function ConvertContent() {
         setResult(data);
         setConversionsUsed((prev) => prev + 1);
         toast.success(
-          `Notebook genere en ${(data.processingTimeMs / 1000).toFixed(1)}s !`
+          t("success", { time: (data.processingTimeMs / 1000).toFixed(1) })
         );
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "Erreur de conversion";
+          error instanceof Error ? error.message : t("errors.conversionError");
         toast.error(message);
       } finally {
         setLoading(false);
@@ -226,7 +222,7 @@ function ConvertContent() {
       return;
     }
 
-    // Flow 2: User NON connecte → Pay-per-use
+    // Pay-per-use flow
     const lineCount = code.split("\n").length;
     let price: number;
     if (lineCount < 200) price = 0.99;
@@ -234,14 +230,14 @@ function ConvertContent() {
     else price = 3.99;
 
     const confirmed = confirm(
-      `Cette conversion coûte ${price.toFixed(2)}€ (${lineCount} lignes).\n\nVous serez redirigé vers Stripe pour le paiement sécurisé.\n\nContinuer ?`
+      t("payPerUse.confirm", { price: price.toFixed(2) + "€", lines: lineCount })
     );
 
     if (!confirmed) return;
 
     setLoading(true);
     setLoadingProgress(10);
-    setLoadingMessage("Preparation du paiement...");
+    setLoadingMessage(t("loading.preparingPayment"));
 
     try {
       setLoadingProgress(30);
@@ -254,19 +250,18 @@ function ConvertContent() {
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Erreur de paiement");
+        throw new Error(err.error || t("errors.paymentError"));
       }
 
       const data = await res.json();
 
       setLoadingProgress(60);
-      setLoadingMessage("Redirection vers Stripe...");
+      setLoadingMessage(t("loading.redirectStripe"));
 
-      // Redirect to Stripe Checkout
       window.location.href = data.checkoutUrl;
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Erreur de paiement";
+        error instanceof Error ? error.message : t("errors.paymentError");
       toast.error(message);
       setLoading(false);
       setLoadingMessage("");
@@ -279,11 +274,11 @@ function ConvertContent() {
       <div className="mx-auto max-w-6xl px-4">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white">
-              Convertir votre code
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+              {t("title")}
             </h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Collez votre script Python ou uploadez un fichier .py
+              {t("subtitle")}
             </p>
           </div>
           <ConversionCounter conversionsUsed={conversionsUsed} plan={userPlan} />
@@ -304,22 +299,21 @@ function ConvertContent() {
               loading={loading}
               disabled={!code.trim()}
             />
-            {/* Progress bar */}
             {loading && loadingMessage && (
               <motion.div
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 p-4"
+                className="overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
               >
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-medium text-zinc-200">{loadingMessage}</p>
-                  <span className="text-sm font-mono text-zinc-300">
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{loadingMessage}</p>
+                  <span className="text-sm font-mono text-zinc-600 dark:text-zinc-300">
                     {Math.round(loadingProgress)}%
                   </span>
                 </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-800">
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-zinc-500 to-zinc-300"
+                    className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600 dark:from-zinc-500 dark:to-zinc-300"
                     initial={{ width: 0 }}
                     animate={{ width: `${loadingProgress}%` }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
@@ -327,20 +321,19 @@ function ConvertContent() {
                 </div>
               </motion.div>
             )}
-            {/* Pay-per-use price indicator */}
             {!user && !loading && code.trim() && (
-              <p className="text-center text-sm text-zinc-400">
-                Paiement a l&apos;usage :{" "}
+              <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+                {t("payPerUse.label")}{" "}
                 {code.split("\n").length < 200 && "0.99€"}
                 {code.split("\n").length >= 200 &&
                   code.split("\n").length <= 1000 &&
                   "1.99€"}
                 {code.split("\n").length > 1000 && "3.99€"}
-                {" "}&bull; Ou{" "}
-                <a href="/login" className="text-zinc-300 hover:underline">
-                  connectez-vous
-                </a>
-                {" "}pour 3 conversions gratuites
+                {" "}&bull; {t("payPerUse.orLogin")}{" "}
+                <Link href="/login" className="text-zinc-700 hover:underline dark:text-zinc-300">
+                  {t("payPerUse.loginLink")}
+                </Link>
+                {" "}{t("payPerUse.freeConversions")}
               </p>
             )}
           </div>
@@ -352,7 +345,7 @@ function ConvertContent() {
           >
             {result && (
               <div className="flex items-center justify-between">
-                <div className="text-xs text-zinc-500">
+                <div className="text-xs text-zinc-400 dark:text-zinc-500">
                   {result.inputTokens + result.outputTokens} tokens |{" "}
                   {(result.processingTimeMs / 1000).toFixed(1)}s
                 </div>

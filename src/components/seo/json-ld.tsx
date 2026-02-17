@@ -57,58 +57,74 @@ const organizationSchema = {
   logo: `${APP_URL}/logo.png`,
 };
 
-const faqSchema = {
-  "@type": "FAQPage",
-  mainEntity: [
+const faqByLocale: Record<string, Array<{ q: string; a: string }>> = {
+  fr: [
     {
-      "@type": "Question",
-      name: "Comment convertir un script Python en notebook Jupyter ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Collez votre code Python dans l'éditeur Py2Nb ou glissez-déposez votre fichier .py. L'IA analyse votre code, ajoute des explications structurées en markdown, puis le convertit automatiquement en fichier .ipynb que vous pouvez télécharger.",
-      },
+      q: "Comment convertir un script Python en notebook Jupyter ?",
+      a: "Collez votre code Python dans l'éditeur Py2Nb ou glissez-déposez votre fichier .py. L'IA analyse votre code, ajoute des explications structurées en markdown, puis le convertit automatiquement en fichier .ipynb que vous pouvez télécharger.",
     },
     {
-      "@type": "Question",
-      name: "Py2Nb est-il gratuit ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Oui, Py2Nb offre un plan gratuit avec 3 conversions par mois pour les fichiers de moins de 500 lignes. Des plans Pro (9,99€/mois) et Premium (29,99€/mois) sont disponibles pour un usage plus intensif.",
-      },
+      q: "Py2Nb est-il gratuit ?",
+      a: "Oui, Py2Nb offre un plan gratuit avec 3 conversions par mois pour les fichiers de moins de 500 lignes. Des plans Pro (9,99€/mois) et Premium (29,99€/mois) sont disponibles pour un usage plus intensif.",
     },
     {
-      "@type": "Question",
-      name: "Quelle IA est utilisée pour documenter le code ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Py2Nb utilise Claude d'Anthropic, un modèle d'IA de pointe, pour analyser votre code Python et générer des explications claires et structurées en français dans le notebook.",
-      },
+      q: "Quelle IA est utilisée pour documenter le code ?",
+      a: "Py2Nb utilise Claude d'Anthropic, un modèle d'IA de pointe, pour analyser votre code Python et générer des explications claires et structurées en français dans le notebook.",
     },
     {
-      "@type": "Question",
-      name: "Mon code est-il sécurisé ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Votre code est traité de manière sécurisée. Il est envoyé à l'API Claude pour analyse, puis les fichiers temporaires sont supprimés immédiatement après la conversion. Aucun code n'est stocké sur nos serveurs au-delà de la conversion.",
-      },
+      q: "Mon code est-il sécurisé ?",
+      a: "Votre code est traité de manière sécurisée. Il est envoyé à l'API Claude pour analyse, puis les fichiers temporaires sont supprimés immédiatement après la conversion. Aucun code n'est stocké sur nos serveurs au-delà de la conversion.",
     },
     {
-      "@type": "Question",
-      name: "Quels formats de sortie sont supportés ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Py2Nb génère des fichiers .ipynb (Jupyter Notebook) compatibles avec JupyterLab, Google Colab, VS Code et tous les environnements Jupyter standard.",
-      },
+      q: "Quels formats de sortie sont supportés ?",
+      a: "Py2Nb génère des fichiers .ipynb (Jupyter Notebook) compatibles avec JupyterLab, Google Colab, VS Code et tous les environnements Jupyter standard.",
+    },
+  ],
+  en: [
+    {
+      q: "How do I convert a Python script to a Jupyter notebook?",
+      a: "Paste your Python code into the Py2Nb editor or drag and drop your .py file. The AI analyzes your code, adds structured markdown explanations, then automatically converts it into a downloadable .ipynb file.",
+    },
+    {
+      q: "Is Py2Nb free?",
+      a: "Yes, Py2Nb offers a free plan with 3 conversions per month for files under 500 lines. Pro (€9.99/month) and Premium (€29.99/month) plans are available for heavier usage.",
+    },
+    {
+      q: "Which AI is used to document the code?",
+      a: "Py2Nb uses Claude by Anthropic, a state-of-the-art AI model, to analyze your Python code and generate clear, structured explanations in the notebook.",
+    },
+    {
+      q: "Is my code secure?",
+      a: "Your code is processed securely. It is sent to the Claude API for analysis, then temporary files are deleted immediately after conversion. No code is stored on our servers beyond the conversion.",
+    },
+    {
+      q: "What output formats are supported?",
+      a: "Py2Nb generates .ipynb (Jupyter Notebook) files compatible with JupyterLab, Google Colab, VS Code, and all standard Jupyter environments.",
     },
   ],
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [webApplicationSchema, organizationSchema, faqSchema],
-};
+function buildFaqSchema(locale: string) {
+  const faqs = faqByLocale[locale] || faqByLocale.fr;
+  return {
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: a,
+      },
+    })),
+  };
+}
 
-export function JsonLd() {
+export function JsonLd({ locale = "fr" }: { locale?: string }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [webApplicationSchema, organizationSchema, buildFaqSchema(locale)],
+  };
+
   return (
     <script
       type="application/ld+json"

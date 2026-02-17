@@ -1,25 +1,20 @@
 import type { MetadataRoute } from "next";
 import { APP_URL } from "@/lib/constants";
 
+const locales = ["fr", "en"];
+const pages = [
+  { path: "", changeFrequency: "weekly" as const, priority: 1.0 },
+  { path: "/convert", changeFrequency: "weekly" as const, priority: 0.9 },
+  { path: "/pricing", changeFrequency: "monthly" as const, priority: 0.8 },
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: APP_URL,
+  return locales.flatMap((locale) =>
+    pages.map((page) => ({
+      url: `${APP_URL}/${locale}${page.path}`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1.0,
-    },
-    {
-      url: `${APP_URL}/convert`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${APP_URL}/pricing`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-  ];
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
+    }))
+  );
 }

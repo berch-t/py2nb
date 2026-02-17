@@ -1,0 +1,268 @@
+{
+  "nav": {
+    "convert": "Convertir",
+    "pricing": "Tarifs",
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Deconnexion",
+    "loginTitle": "Bienvenue sur Py2Nb",
+    "signupTitle": "Creer un compte",
+    "loginDescription": "Connectez-vous pour convertir vos scripts Python en notebooks professionnels",
+    "signupDescription": "Inscrivez-vous pour commencer a convertir vos scripts Python",
+    "name": "Nom",
+    "namePlaceholder": "Votre nom",
+    "email": "Email",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "loginButton": "Se connecter",
+    "signupButton": "Creer mon compte",
+    "loginLoading": "Connexion...",
+    "signupLoading": "Creation...",
+    "googleButton": "Continuer avec Google",
+    "or": "ou",
+    "alreadyAccount": "Deja un compte ?",
+    "noAccount": "Pas encore de compte ?",
+    "switchToLogin": "Se connecter",
+    "switchToSignup": "S'inscrire",
+    "termsNotice": "En continuant, vous acceptez nos conditions d'utilisation et notre politique de confidentialite.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "errors": {
+      "auth/email-already-in-use": "Cette adresse email est deja utilisee.",
+      "auth/invalid-email": "Adresse email invalide.",
+      "auth/weak-password": "Le mot de passe doit contenir au moins 6 caracteres.",
+      "auth/user-not-found": "Aucun compte associe a cette adresse email.",
+      "auth/wrong-password": "Mot de passe incorrect.",
+      "auth/invalid-credential": "Email ou mot de passe incorrect.",
+      "auth/too-many-requests": "Trop de tentatives. Reessayez plus tard.",
+      "default": "Une erreur est survenue."
+    }
+  },
+  "hero": {
+    "title": "Python → ",
+    "titleHighlight": "Notebook",
+    "subtitle": "Des notebooks qui racontent votre raisonnement :",
+    "subtitleLine2": "Documentes et prets pour la presentation.",
+    "subtitleLine3": "Notre IA analyse, commente et structure votre code automatiquement.",
+    "cta": "Essayer maintenant",
+    "ctaSecondary": "Voir les tarifs",
+    "demoFile": "analyse_clients.ipynb",
+    "demoTitle": "Analyse de Donnees Clients",
+    "demoDescription": "Ce notebook realise une analyse exploratoire complete du jeu de donnees clients. Nous allons explorer la distribution des achats, identifier les segments cles et visualiser les tendances principales.",
+    "demoTitle2": "Distribution des Achats",
+    "demoDescription2": "Le graphique ci-dessous montre la repartition des achats par segment client. Les clients Premium representent 35% du volume total."
+  },
+  "features": {
+    "title": "Tout ce qu'il faut pour des notebooks parfaits",
+    "subtitle": "Un pipeline complet de l'analyse IA a l'export Jupyter, sans compromis sur la qualite.",
+    "items": {
+      "ai": {
+        "title": "IA Claude de pointe",
+        "description": "Claude Sonnet 4.5 analyse, documente et structure votre code avec une precision professionnelle."
+      },
+      "jupytext": {
+        "title": "Format Jupytext natif",
+        "description": "Conversion via Jupytext pour des notebooks parfaitement formates et compatibles partout."
+      },
+      "speed": {
+        "title": "Rapide et instantane",
+        "description": "Collez votre code, cliquez, et obtenez un notebook professionnel en quelques secondes."
+      },
+      "export": {
+        "title": "Export .ipynb",
+        "description": "Telechargez directement au format Jupyter Notebook, pret pour JupyterLab ou Google Colab."
+      },
+      "docs": {
+        "title": "Documentation intelligente",
+        "description": "L'IA detecte le type de script et adapte les commentaires : ML, data analysis, API, etc."
+      },
+      "security": {
+        "title": "Securise",
+        "description": "Votre code n'est jamais stocke au-dela de la conversion. Authentification Firebase securisee."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "Comment ca marche",
+    "subtitle": "Trois etapes simples pour transformer votre code en notebook professionnel.",
+    "steps": {
+      "paste": {
+        "title": "1. Collez votre code",
+        "description": "Collez votre script Python ou glissez-deposez un fichier .py dans la zone de saisie."
+      },
+      "analyze": {
+        "title": "2. L'IA analyse et documente",
+        "description": "Claude AI analyse votre code, ajoute des explications et le structure en cellules Jupyter."
+      },
+      "download": {
+        "title": "3. Telechargez le notebook",
+        "description": "Recuperez votre notebook .ipynb professionnel, pret pour JupyterLab ou Google Colab."
+      }
+    }
+  },
+  "pricing": {
+    "title": "Tarifs simples et transparents",
+    "subtitle": "Commencez gratuitement. Passez au Pro quand vous etes pret.",
+    "pageTitle": "Tarifs",
+    "pageSubtitle": "Choisissez le plan qui vous convient. Commencez gratuitement, passez au Pro quand vous etes pret.",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "freeMonths": "2 mois gratuits",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "perMonthEquiv": "Soit {price}/mois",
+    "discount": "-16% soit 2 mois offerts",
+    "mostPopular": "Le plus populaire",
+    "payPerUse": {
+      "title": "Pay-per-use aussi disponible",
+      "subtitle": "Pas d'abonnement ? Payez a l'utilisation :",
+      "small": "/ <200 lignes",
+      "medium": "/ 200-1000 lignes",
+      "large": "/ >1000 lignes"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "description": "Pour decouvrir Py2Nb",
+        "features": ["3 conversions/mois", "Fichiers < 500 lignes", "Export .ipynb"],
+        "cta": "Commencer gratuitement"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Pour les developpeurs actifs",
+        "features": [
+          "50 conversions/mois",
+          "Fichiers jusqu'a 5000 lignes",
+          "Export .ipynb",
+          "Historique des conversions",
+          "Priorite de traitement"
+        ],
+        "cta": "Passer au Pro"
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "Pour les equipes et power users",
+        "features": [
+          "Conversions illimitees",
+          "Fichiers sans limite de taille",
+          "Export multi-formats",
+          "API REST privee",
+          "Support prioritaire 24/7"
+        ],
+        "cta": "Passer au Premium"
+      }
+    }
+  },
+  "convert": {
+    "title": "Convertir votre code",
+    "subtitle": "Collez votre script Python ou uploadez un fichier .py",
+    "loading": {
+      "sending": "Envoi du code...",
+      "analyzing": "Analyse de votre code par Claude AI...",
+      "generating": "Generation du notebook...",
+      "done": "Termine !",
+      "verifyingPayment": "Verification du paiement...",
+      "paymentConfirmed": "Paiement confirme. Lancement de la conversion...",
+      "preparingPayment": "Preparation du paiement...",
+      "redirectStripe": "Redirection vers Stripe..."
+    },
+    "errors": {
+      "emptyCode": "Veuillez coller du code Python",
+      "conversionError": "Erreur de conversion",
+      "paymentError": "Erreur de paiement",
+      "paymentCanceled": "Paiement annule"
+    },
+    "success": "Notebook genere en {time}s !",
+    "payPerUse": {
+      "label": "Paiement a l'usage :",
+      "orLogin": "Ou",
+      "loginLink": "connectez-vous",
+      "freeConversions": "pour 3 conversions gratuites",
+      "confirm": "Cette conversion coute {price} ({lines} lignes).\n\nVous serez redirige vers Stripe pour le paiement securise.\n\nContinuer ?"
+    }
+  },
+  "converter": {
+    "button": {
+      "convert": "Convertir en Notebook",
+      "converting": "Conversion en cours..."
+    },
+    "counter": {
+      "payPerUse": "Paiement a l'usage",
+      "premium": "Premium - Illimite",
+      "conversions": "{used}/{limit} conversions"
+    },
+    "download": {
+      "download": "Telecharger .ipynb",
+      "copy": "Copier JSON",
+      "copied": "Copie !"
+    },
+    "preview": {
+      "empty": "Le notebook apparaitra ici apres la conversion",
+      "cells": "{count} cellules"
+    }
+  },
+  "codeInput": {
+    "placeholder": "Collez votre code Python ici ou glissez-deposez un fichier .py...",
+    "dragDrop": "Glissez un fichier .py ici",
+    "upload": "Upload .py",
+    "characters": "caracteres",
+    "lines": "lignes",
+    "errors": {
+      "invalidFile": "Seuls les fichiers Python (.py) sont acceptes",
+      "fileTooBig": "Fichier trop volumineux (max 5MB)"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Bienvenue, {name}",
+    "upgradePro": "Passer au Pro",
+    "stats": {
+      "currentPlan": "Plan actuel",
+      "totalConversions": "Conversions totales",
+      "thisMonth": "Ce mois-ci",
+      "tokensUsed": "Tokens utilises"
+    },
+    "history": {
+      "title": "Historique des conversions",
+      "empty": "Aucune conversion pour le moment",
+      "makeConversion": "Faire une conversion",
+      "pastedCode": "Code colle",
+      "lines": "lignes",
+      "tokens": "tokens",
+      "completed": "Termine",
+      "loading": "Chargement..."
+    }
+  },
+  "footer": {
+    "description": "Transformez vos scripts Python en notebooks Jupyter professionnels avec l'IA.",
+    "product": "Produit",
+    "convert": "Convertir",
+    "pricing": "Tarifs",
+    "legal": "Legal",
+    "terms": "CGU",
+    "privacy": "Confidentialite",
+    "contact": "Contact",
+    "copyright": "© {year} Py2Nb. Tous droits reserves."
+  },
+  "metadata": {
+    "homeTitle": "Py2Nb — Convertissez vos scripts Python en notebooks Jupyter avec l'IA",
+    "homeDescription": "Collez votre code Python, l'IA ajoute des explications structurees en markdown, et telechargez un notebook Jupyter (.ipynb) professionnel. Gratuit jusqu'a 3 conversions/mois.",
+    "convertTitle": "Convertir Python en Notebook Jupyter",
+    "convertDescription": "Collez votre script Python ou glissez-deposez un fichier .py. L'IA analyse votre code, ajoute de la documentation structuree, et genere un notebook Jupyter (.ipynb) professionnel en quelques secondes.",
+    "pricingTitle": "Tarifs — Plans Free, Pro et Premium",
+    "pricingDescription": "Commencez gratuitement avec 3 conversions/mois. Plan Pro a 9,99€/mois pour 50 conversions. Plan Premium a 29,99€/mois pour un usage illimite avec API REST et support prioritaire.",
+    "dashboardTitle": "Dashboard",
+    "loginTitle": "Connexion"
+  },
+  "common": {
+    "or": "ou",
+    "tokens": "tokens",
+    "markdown": "Markdown",
+    "code": "Code",
+    "output": "Output",
+    "python": "Python"
+  }
+}

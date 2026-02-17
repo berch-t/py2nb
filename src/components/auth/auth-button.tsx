@@ -1,17 +1,19 @@
 "use client";
 
 import { useAuthStore } from "@/stores/auth-store";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export function AuthButton() {
   const { user, loading, logout } = useAuthStore();
+  const t = useTranslations("auth");
 
   if (loading) {
     return (
-      <div className="h-10 w-24 animate-pulse rounded-lg bg-zinc-800" />
+      <div className="h-10 w-24 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
     );
   }
 
@@ -31,7 +33,7 @@ export function AuthButton() {
             <User className="h-4 w-4 text-zinc-950" />
           </div>
         )}
-        <span className="hidden text-sm text-zinc-300 sm:inline">
+        <span className="hidden text-sm text-zinc-600 sm:inline dark:text-zinc-300">
           {user.displayName || user.email}
         </span>
         <Button variant="ghost" size="sm" onClick={logout}>
@@ -44,10 +46,10 @@ export function AuthButton() {
   return (
     <div className="flex items-center gap-2">
       <Button variant="ghost" size="sm" asChild>
-        <Link href="/login">Connexion</Link>
+        <Link href="/login">{t("login")}</Link>
       </Button>
       <Button size="sm" asChild>
-        <Link href="/login?mode=signup">S&apos;inscrire</Link>
+        <Link href="/login?mode=signup">{t("signup")}</Link>
       </Button>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -15,6 +16,8 @@ export function ConvertButton({
   loading,
   disabled,
 }: ConvertButtonProps) {
+  const t = useTranslations("converter.button");
+
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Button
@@ -26,12 +29,12 @@ export function ConvertButton({
         {loading ? (
           <>
             <Loader2 className="h-5 w-5 animate-spin" />
-            Conversion en cours...
+            {t("converting")}
           </>
         ) : (
           <>
             <Sparkles className="h-5 w-5" />
-            Convertir en Notebook
+            {t("convert")}
           </>
         )}
       </Button>

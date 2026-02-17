@@ -1,30 +1,31 @@
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedPaths = ["/dashboard"];
-const authPaths = ["/login"];
+const intlMiddleware = createIntlMiddleware(routing);
 
 export function middleware(request: NextRequest) {
+  const response = intlMiddleware(request);
+
   const token = request.cookies.get("firebase-auth-token")?.value;
   const { pathname } = request.nextUrl;
+  const pathWithoutLocale = pathname.replace(/^\/(fr|en)/, "") || "/";
 
-  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
-  const isAuthPage = authPaths.some((p) => pathname.startsWith(p));
-
-  if (isProtected && !token) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+  if (pathWithoutLocale.startsWith("/dashboard") && !token) {
+    const locale = pathname.startsWith("/en") ? "en" : "fr";
+    const loginUrl = new URL(`/${locale}/login`, request.url);
+    loginUrl.searchParams.set("redirect", pathWithoutLocale);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthPage && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  if (pathWithoutLocale.startsWith("/login") && token) {
+    const locale = pathname.startsWith("/en") ? "en" : "fr";
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|logo\\.png|logo_solo.*\\.png|manifest\\.json|icon-.*\\.png|apple-touch-icon\\.png|sitemap\\.xml|robots\\.txt).*)",
-  ],
+  matcher: "/((?!api|_next|_vercel|.*\\..*).*)",
 };
